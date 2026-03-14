@@ -102,4 +102,4 @@ export const DEFAULT_PROVIDER   = PROVIDERS[0]; // Groq
 export const DEFAULT_BASE_URL   = process.env.DEFAULT_BASE_URL  ?? PROVIDERS[0].baseUrl;
 export const DEFAULT_MODEL      = process.env.DEFAULT_MODEL     ?? PROVIDERS[0].defaultModel;
 export const DEFAULT_API_KEY    = process.env.DEFAULT_API_KEY   ?? '';
-export const APP_NAME           = 'PostCraft';
+export const APP_NAME           = 'PostGenerate';

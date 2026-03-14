@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import type { Settings } from '@/types';
 import { DEFAULT_BASE_URL, DEFAULT_MODEL, DEFAULT_API_KEY } from '@/lib/constants';
 
-const STORAGE_KEY = 'postcraft_settings';
+const STORAGE_KEY = 'postgenerate_settings';
 
 const defaults: Settings = {
   apiKey:  DEFAULT_API_KEY,

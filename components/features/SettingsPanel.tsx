@@ -1,21 +1,22 @@
 'use client';
 import { useState } from 'react';
 import type { Settings } from '@/types';
+import type { useLinkedIn } from '@/hooks/useLinkedIn';
 import { PROVIDERS } from '@/lib/constants';
-import { KeyIcon } from '@/components/icons';
+import { KeyIcon, LinkedInIcon, CheckIcon } from '@/components/icons';
 
 interface Props {
   settings: Settings;
   onSave: (s: Settings) => void;
   freeUsed: number;
   freeLimit: number;
+  linkedin: ReturnType<typeof useLinkedIn>;
 }
 
-export function SettingsPanel({ settings, onSave }: Props) {
+export function SettingsPanel({ settings, onSave, linkedin }: Props) {
   const [draft, setDraft] = useState<Settings>(settings);
   const [saved, setSaved] = useState(false);
 
-  // Detect active provider by baseUrl
   const activeProvider = PROVIDERS.find(
     p => draft.baseUrl.replace(/\/$/, '') === p.baseUrl.replace(/\/$/, '')
   );
@@ -34,6 +35,38 @@ export function SettingsPanel({ settings, onSave }: Props) {
 
   return (
     <div className="settings-panel">
+
+      {/* ─── LinkedIn Connect ─── */}
+      <div className="settings-card">
+        <div className="settings-card-header">
+          <LinkedInIcon className="settings-icon linkedin-color" />
+          <span className="settings-card-title">LinkedIn</span>
+        </div>
+
+        {linkedin.isConnected ? (
+          <div className="li-connected">
+            <div className="li-connected-info">
+              <CheckIcon className="li-check" />
+              <span className="li-name">Connected as <strong>{linkedin.token!.name}</strong></span>
+            </div>
+            <button className="li-disconnect-btn" onClick={linkedin.disconnect}>Disconnect</button>
+          </div>
+        ) : (
+          <div className="li-connect-wrap">
+            <p className="li-connect-desc">
+              Connect your LinkedIn account to post directly from PostCraft.
+              Requires <code>LINKEDIN_CLIENT_ID</code>, <code>LINKEDIN_CLIENT_SECRET</code>, and{' '}
+              <code>LINKEDIN_REDIRECT_URI</code> in your <code>.env.local</code>.
+            </p>
+            <a href="/api/linkedin/auth" className="li-connect-btn">
+              <LinkedInIcon className="li-btn-icon" />
+              Connect LinkedIn
+            </a>
+          </div>
+        )}
+      </div>
+
+      {/* ─── AI Provider ─── */}
       <div className="settings-card">
         <div className="settings-card-header">
           <KeyIcon className="settings-icon" />
@@ -56,49 +89,33 @@ export function SettingsPanel({ settings, onSave }: Props) {
           ))}
         </div>
 
-        {activeProvider && (
-          <p className="provider-hint">{activeProvider.hint}</p>
-        )}
+        {activeProvider && <p className="provider-hint">{activeProvider.hint}</p>}
 
         <div className="settings-divider" />
 
-        {/* Base URL */}
         <div className="settings-field">
           <label className="settings-field-label">Base URL</label>
-          <input
-            className="settings-input mono"
-            value={draft.baseUrl}
+          <input className="settings-input mono" value={draft.baseUrl}
             onChange={e => setDraft(d => ({ ...d, baseUrl: e.target.value }))}
-            spellCheck={false}
-            autoComplete="off"
-          />
+            spellCheck={false} autoComplete="off" />
         </div>
 
-        {/* Model */}
         <div className="settings-field">
           <label className="settings-field-label">Model</label>
-          <input
-            className="settings-input mono"
-            value={draft.model}
+          <input className="settings-input mono" value={draft.model}
             onChange={e => setDraft(d => ({ ...d, model: e.target.value }))}
             placeholder={activeProvider?.defaultModel ?? 'model-name'}
-            spellCheck={false}
-            autoComplete="off"
-          />
+            spellCheck={false} autoComplete="off" />
         </div>
 
-        {/* API Key — hide for local providers */}
         {(activeProvider?.needsKey ?? true) && (
           <div className="settings-field">
             <label className="settings-field-label">API Key</label>
-            <input
-              type="password"
-              className="settings-input"
+            <input type="password" className="settings-input"
               placeholder="Your provider API key"
               value={draft.apiKey}
               onChange={e => setDraft(d => ({ ...d, apiKey: e.target.value }))}
-              autoComplete="new-password"
-            />
+              autoComplete="new-password" />
             <span className="settings-field-hint">Stored locally — never sent to our servers.</span>
           </div>
         )}

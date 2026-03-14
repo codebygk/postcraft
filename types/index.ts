@@ -40,3 +40,12 @@ export interface ApiError {
   message: string;
   status?: number;
 }
+
+export interface LinkedInToken {
+  accessToken: string;
+  expiresAt: number;   // ms timestamp
+  sub: string;         // LinkedIn person URN like "urn:li:person:xxxx"
+  name: string;
+}
+
+export type PostStatus = 'idle' | 'uploading' | 'posting' | 'done' | 'error';

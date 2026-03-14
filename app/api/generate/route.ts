@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'https://postcraft.app',
-        'X-Title': 'PostCraft',
+        'HTTP-Referer': 'https://postgenerate.app',
+        'X-Title': 'PostGenerate',
       },
       body: JSON.stringify({
         model,

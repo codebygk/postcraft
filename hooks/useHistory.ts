@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import type { HistoryEntry, GeneratedResults } from '@/types';
 
-const STORAGE_KEY = 'postcraft_history';
+const STORAGE_KEY = 'postgenerate_history';
 const MAX_ENTRIES = 20;
 
 /** Migrate entries that were saved under old GeneratedPair shape */

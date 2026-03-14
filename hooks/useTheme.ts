@@ -5,7 +5,7 @@ export function useTheme() {
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('postcraft_theme');
+    const saved = localStorage.getItem('postgenerate_theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const isDark = saved ? saved === 'dark' : prefersDark;
     setDark(isDark);
@@ -16,7 +16,7 @@ export function useTheme() {
     setDark(d => {
       const next = !d;
       document.documentElement.classList.toggle('dark', next);
-      localStorage.setItem('postcraft_theme', next ? 'dark' : 'light');
+      localStorage.setItem('postgenerate_theme', next ? 'dark' : 'light');
       return next;
     });
   }

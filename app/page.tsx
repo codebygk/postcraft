@@ -5,6 +5,7 @@ import { generatePosts } from '@/lib/api';
 import { useSettings } from '@/hooks/useSettings';
 import { useHistory } from '@/hooks/useHistory';
 import { useTheme } from '@/hooks/useTheme';
+import { useLinkedIn } from '@/hooks/useLinkedIn';
 import { APP_NAME, PLATFORMS } from '@/lib/constants';
 import { PostForm } from '@/components/features/PostForm';
 import { PostResult } from '@/components/features/PostResult';
@@ -19,6 +20,7 @@ export default function Home() {
   const { settings, saveSettings, loaded } = useSettings();
   const { history, addEntry, clearHistory } = useHistory();
   const { dark, toggle: toggleTheme }       = useTheme();
+  const linkedin                            = useLinkedIn();
 
   const [tab,              setTab]             = useState<Tab>('generate');
   const [loading,          setLoading]         = useState(false);
@@ -26,7 +28,24 @@ export default function Home() {
   const [results,          setResults]         = useState<GeneratedResults | null>(null);
   const [enabledPlatforms, setEnabledPlatforms]= useState<Platform[]>(['linkedin', 'x', 'instagram']);
 
-  useEffect(() => { /* no free-tier usage check needed */ }, []);
+  // Handle LinkedIn OAuth callback — token passed in query string
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const raw    = params.get('linkedin_token');
+    const err    = params.get('linkedin_error');
+
+    if (raw) {
+      try {
+        const t = JSON.parse(decodeURIComponent(raw));
+        linkedin.saveToken(t);
+      } catch {}
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+    if (err) {
+      setError(`LinkedIn auth failed: ${err}`);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
 
   async function handleGenerate(req: GenerateRequest) {
     const active = PLATFORMS.map(p => p.id).filter(id => req.platformSettings[id]?.enabled);
@@ -66,13 +85,17 @@ export default function Home() {
       </header>
 
       <div className="app-body">
-        {/* Generate panel — always mounted to preserve form state */}
         <div className={`generate-layout${tab === 'generate' ? '' : ' generate-layout-hidden'}`}>
           <PostForm onGenerate={handleGenerate} loading={loading} limitReached={false} />
           <main className="results-area">
             {error && <div className="error-banner">{error}</div>}
             {(loading || results) ? (
-              <PostResult results={results ?? {}} loading={loading} enabledPlatforms={enabledPlatforms} />
+              <PostResult
+                results={results ?? {}}
+                loading={loading}
+                enabledPlatforms={enabledPlatforms}
+                linkedin={linkedin}
+              />
             ) : (
               <div className="empty-state">
                 <SparkleIcon className="empty-icon" />
@@ -95,6 +118,7 @@ export default function Home() {
               onSave={s => { saveSettings(s); setError(''); }}
               freeUsed={0}
               freeLimit={0}
+              linkedin={linkedin}
             />
           </main>
         )}
